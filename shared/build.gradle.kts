@@ -19,7 +19,7 @@ kotlin {
     }
     
     android {
-       namespace = "org.example.project.shared"
+       namespace = "com.joinme.shared"
        compileSdk = libs.versions.android.compileSdk.get().toInt()
        minSdk = libs.versions.android.minSdk.get().toInt()
     
@@ -53,6 +53,9 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.navigation.compose)
+            implementation(libs.kotlinx.datetime)
+            implementation(libs.phosphor.icon)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
