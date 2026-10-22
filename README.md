@@ -1,102 +1,56 @@
 # JoinMe
 
-**JoinMe** is a mobile application designed to help Erasmus and international students find people to join simple social activities.
+JoinMe is a course project for **Introduction to Mobile Systems — Mobile for Social Good**.
 
-Moving to another country often means starting without an established social circle. Even when student residences provide shared facilities such as table tennis tables, football courts, common rooms, board games or projectors, students may not know who is available or interested in doing the same activity.
+**Team:** Nicolás Maqueda and Jaime Criado. The team has confirmed that both instructors have accepted access to the repository and approved Kotlin Multiplatform + Compose Multiplatform.
 
-JoinMe makes that first interaction easier by focusing on **activities instead of profiles**.
+## Our idea
 
-## The idea
+We want to help adult Erasmus and international students find people for simple activities in their residence. A student may want to play table tennis but not know who to ask. A group may want to play football but need more players.
 
-A student can create an activity such as:
+JoinMe puts activities first. Students can see what is planned, when and where it happens, and how many places are available. We do not claim that the app solves loneliness or guarantees friendships.
 
-> 🏓 **Table Tennis**  
-> Today · 19:00  
-> Games Room  
-> 1 / 2 participants
+## Current version: M1 prototype
 
-Other students can discover the activity and join it.
+The Android prototype has four screens:
 
-Another example:
+- **Activities:** browse and filter sample activities.
+- **Activity Detail:** see the information and join, leave or cancel an activity you created.
+- **Create Activity:** choose an activity, date, time, place and number of people.
+- **My Activities:** see activities you created or joined, grouped into Upcoming and Past.
 
-> ⚽ **Football**  
-> Saturday · 17:00  
-> Sports Court  
-> 5 / 8 participants
+The main task is: **find Table Tennis → open its details → join → find it in My Activities**.
 
-Once the required number of participants is reached, the activity is marked as full.
+The prototype uses made-up data and one fixed test user. Data stays in memory and resets when the app process restarts. Two phones do not share activities yet. Sample dates are based on the day the repository is created when the app starts.
 
-The main idea is simple:
+## What comes later
 
-> **Find something to do together, rather than searching for people to meet.**
+We plan to add Room for saved data on the phone, Supabase for shared data, network loading and error messages, and access to previously saved activities without a connection. We also plan optional activity reminders. If notification permission is denied, users will still be able to check My Activities.
 
-## Main features
+These features are not implemented in M1. Android is our required platform. iOS is an optional extension that needs a Mac and Xcode to build and test.
 
-JoinMe allows users to:
+Chat, social profiles, followers, photos, GPS, payments, ratings, AI matching and complex login are outside the project scope. Editing activities and checking overlapping times are also outside the current agreed scope.
 
-- Browse available activities
-- View activity details
-- Create new activities
-- Join and leave activities
-- See how many participants have joined
-- Manage activities they created
-- View upcoming and previous activities
-- Filter activities by type or availability
-- Receive reminders for upcoming activities
+## Run and understand the project
 
-## Activity examples
+Start with the [setup guide](DEPLOY.md). It explains the Android SDK, emulator and build commands.
 
-JoinMe can be used for activities such as:
+With the SDK configured, run these commands from PowerShell in the project folder:
 
-- Table Tennis
-- Football
-- Padel
-- Badminton
-- Pool
-- Table Football
-- Darts
-- Board Games
-- Cards
-- Movie Nights
-- Other custom activities
+```powershell
+.\gradlew.bat :androidApp:assembleDebug
+.\gradlew.bat :shared:testAndroidHostTest
+```
 
-## Activity states
+On macOS or Linux, use `./gradlew` instead of `.\gradlew.bat`.
 
-Activities can have different states:
+The code uses Kotlin and Compose Multiplatform. Screens show the interface, ViewModels prepare screen data, and a repository stores activities. The [project notes](CONTEXT.md) explain these parts with a join example.
 
-- **OPEN** – more participants can join
-- **FULL** – the maximum number of participants has been reached
-- **CANCELLED** – the creator cancelled the activity
-- **COMPLETED** – the activity has already taken place
+## Project documents
 
-## Target users
+- [M1 brief and prototype images](M1.md): the short document for submission.
+- [M1 supporting notes](docs/m1/M1-details.md): acceptance criteria, peer feedback, accessibility checks and risks.
+- [Project notes](CONTEXT.md): code structure, limits and next steps.
+- [Setup and demo guide](DEPLOY.md): build, run and test instructions.
 
-JoinMe is mainly designed for adult Erasmus and international students living in student residences or shared university accommodation.
-
-It is particularly useful for students who have recently arrived and do not yet have an established social group.
-
-## Scope
-
-JoinMe is intentionally designed to remain simple.
-
-It is **not** intended to be a social network.
-
-The application does not focus on:
-
-- Followers
-- Friends
-- Likes
-- Ratings
-- Private messaging
-- Complex profiles
-- Matching algorithms
-
-The goal is to provide a fast and simple way to answer one question:
-
-> **Who wants to do this with me?**
-
-## Project goal
-
-The objective of JoinMe is to reduce one practical barrier to social interaction by making it easier for students to discover and join shared activities.
-
-JoinMe does not aim to solve loneliness or guarantee social integration. Instead, it provides a simple tool that can help create opportunities for people to meet through common interests and activities.
+The app uses Inter fonts and Phosphor icons. The bundled Inter licence is in [docs/licenses/Inter-OFL.txt](docs/licenses/Inter-OFL.txt).

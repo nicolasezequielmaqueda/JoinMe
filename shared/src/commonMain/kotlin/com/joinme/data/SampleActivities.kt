@@ -10,10 +10,10 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 
 /**
- * Synthetic activities for the prototype. No real people: only fake ids.
+ * Made-up activities for the prototype, with fake user IDs.
  *
- * Dates are relative to [today], so the "Today" filter always has results
- * and there is always one completed activity in My Activities.
+ * Dates are based on [today] when this list is created.
+ * The initial list includes an activity today and a completed one yesterday.
  */
 object SampleActivities {
 

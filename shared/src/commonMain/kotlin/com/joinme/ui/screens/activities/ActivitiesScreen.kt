@@ -101,7 +101,7 @@ private fun NewButton(onClick: () -> Unit) {
     }
 }
 
-/** Horizontal list of filters. It scrolls, so it also works with big fonts. */
+/** Horizontal list of filters. Users can scroll to reach more options. */
 @Composable
 private fun FilterRow(selected: ActivityFilter, onFilterSelected: (ActivityFilter) -> Unit) {
     LazyRow(

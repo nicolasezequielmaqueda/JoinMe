@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.Color
  * Colours of JoinMe. Calm and neutral, inspired by iOS:
  * grey background, white cards and one soft accent colour.
  *
- * Text colours keep a contrast of at least 4.5:1 with the background.
+ * Text and background colour pairs still need a full contrast check.
  */
 @Immutable
 data class JoinMeColors(

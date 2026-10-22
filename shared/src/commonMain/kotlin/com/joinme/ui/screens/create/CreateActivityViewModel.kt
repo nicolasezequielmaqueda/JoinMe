@@ -34,8 +34,8 @@ data class CreateActivityUiState(
 
 /**
  * Logic of the Create Activity screen (US3 – Create).
- * Every change in the form is validated again, so the button is only
- * enabled when the activity can really be created.
+ * Check the form after every change to decide whether to enable Create.
+ * The repository checks it again when saving, including the current time.
  */
 class CreateActivityViewModel(private val repository: ActivityRepository) : ViewModel() {
 

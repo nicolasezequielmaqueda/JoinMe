@@ -1,658 +1,85 @@
-# JOINME – MOBILE FOR SOCIAL GOOD
+# JoinMe — Project notes
 
-**Course:** Introduction to Mobile Systems  
-**Project:** JoinMe  
-**Team:** Nico & Jaime  
-**Primary development platform:** Android  
-**Additional target platform:** iOS  
-**Technology:** Kotlin Multiplatform + Compose Multiplatform  
-**Backend as a Service:** Supabase  
-**Local persistence:** Room  
-**Development environment:** IntelliJ IDEA Ultimate
+These notes explain the project and help us prepare for the code discussion. The short submission document is [M1.md](M1.md).
 
----
+## Goal and scope
 
-## 1. Project Idea
+We are Nicolás Maqueda and Jaime Criado. We are building JoinMe for adult Erasmus and international students who want to find people for activities in their residence.
 
-**JoinMe** is a mobile application designed to help Erasmus and international students take part in simple social activities with other students.
+Our main task is **Activities → Activity Detail → Join → My Activities**. A second task lets the user create an activity. We use four screens and focus on making these tasks work well.
 
-The application focuses on a very specific problem:
+Android is the required platform. The instructors have approved Kotlin Multiplatform and Compose Multiplatform, as confirmed by the team. The project includes an iOS target, but building and testing it is optional and needs macOS and Xcode.
 
-**A student wants to do an activity but does not have enough people to do it with.**
+## What works in M1
 
-Instead of asking users to create social profiles, make friends, chat with strangers or join a traditional social network, JoinMe focuses directly on activities.
+The prototype supports browsing, filters, details, joining, leaving, creating, cancelling your own activities, and Upcoming/Past lists. It uses made-up activity data and a fixed test user called `user-me`.
 
-For example:
+Activities are stored in memory. Changes disappear when the app process restarts. Moving the app to the background does not always restart the process. There is no database, server request, shared data between devices or reminder system yet.
 
-**Table Tennis**  
-Today · 19:00  
-Games Room  
-1 / 2 participants  
-**JOIN**
+## How the code is organised
 
-or:
+| Part | Purpose | Example |
+|---|---|---|
+| `model` | Classes that describe the data | `Activity` stores the date, place and participants. |
+| `domain` | Rules that do not depend on the screen | `ActivityRules` checks whether someone can join. |
+| `data` | Stores activities and provides access to them | `FakeActivityRepository` keeps a list in memory. |
+| `ui/screens` | Screens and their ViewModels | `ActivityDetailViewModel` handles Join and Leave. |
+| `ui/components` | Interface parts used by several screens | Buttons, cards and status labels. |
+| `ui/navigation` | Moves between screens | A detail route includes the activity ID. |
+| `ui/theme` | Shared colours and text styles | Light and dark themes. |
+| `util` | Date and time helpers | Display a date as Today or Tomorrow. |
 
-**Football**  
-Saturday · 17:00  
-Sports Court  
-5 / 8 participants  
-**JOIN**
+A **ViewModel** holds the data and actions for a screen. A **repository** is the place the ViewModels use to read or change activities. `AppContainer` creates one repository shared by all screens.
 
-The objective is to make the first social interaction easier by giving students a clear reason to meet: doing something together.
+`StateFlow` holds a value that screens can observe. When the repository changes its list, the ViewModels prepare new screen data and Compose updates the interface. Repository actions use `suspend` functions so they can later include database or network work.
 
----
+## What happens when someone joins
 
-## 2. Social Problem
+1. The user presses Join activity.
+2. `ActivityDetailViewModel` calls `joinActivity` on the repository.
+3. The repository finds the activity and calls `ActivityRules.join`.
+4. The rule checks membership and status. It returns an updated copy or an error message.
+5. If successful, the repository replaces the old activity in its list.
+6. The screens receive the updated data. The count increases and the activity appears in My Activities.
 
-Moving to another country for an Erasmus or international study period normally means leaving an existing social circle behind and entering an unfamiliar environment.
+The creator counts as the first participant. Users cannot join twice or join a full, cancelled or completed activity. Creators cancel their activities instead of leaving them.
 
-Student residences may already provide shared facilities such as table tennis tables, common rooms, football courts, board games, projectors, pool tables or table football.
+## Dates and status
 
-However, access to these facilities does not automatically mean that a student has someone to use them with.
+The sample dates are based on the current day when the repository is created. Table Tennis starts today at 23:00 with one free place. Pool is full, Padel is cancelled, and Darts is completed. The cancelled Padel example does not appear in the main list or this user's activities. To show cancellation, cancel Board Games, which belongs to the test user.
 
-Two simple examples illustrate the problem.
+Status is calculated from the activity and a supplied time: cancelled first, then completed if its end time has passed, then full if no places remain, otherwise open. In this prototype, joining after the start is allowed until the end time. The UI recalculates status when its data updates; it does not have a timer that refreshes status every minute.
 
-### Example 1 – Table Tennis
+## Next steps
 
-A newly arrived Erasmus student wants to play table tennis in the residence.
+- **Saved data:** use Room so joined activities survive a restart.
+- **Shared data:** use Supabase and show loading, success and failure states.
+- **Offline use:** show the last saved activities and explain that they may be out of date. Define what happens to join requests without a connection before implementing them.
+- **Reminders:** add local notifications. Denied permission must not block the main task.
+- **Verification:** test restart and network failure, finish accessibility checks, and run two voluntary usability sessions with consenting adult peers outside the team.
 
-The table is available, but table tennis requires another player. The student has only recently arrived and does not yet know who might want to play.
+A server will also need to check who may change an activity and how to prevent two users from taking the last place at the same time. The in-memory rules are not enough for shared use.
 
-With JoinMe, the student could create:
+Chat, profiles, GPS, payments, AI matching, activity editing and time-conflict warnings are outside the current scope. Each student has 25 hours of independent work, so the main task comes first.
 
-**Table Tennis – Today at 19:00 – Games Room – 1 more player needed**
+## Tests and honest reporting
 
-Another student can discover the activity and join.
+There are 14 automated tests for activity rules and form validation. They use a fixed time, so the result does not depend on the day they run. These tests do not prove that the interface or accessibility works.
 
-### Example 2 – Football
+The [M1 supporting notes](docs/m1/M1-details.md) record the peer review and pending checks. We must only report tests we have actually completed. The two-classmate review was informal and does not prove wider social benefits.
 
-A student wants to organise a football match, but currently only has four people and needs eight.
+AI has helped review documentation, explain the code and check the project in this working session. We must read and verify the changes, understand the main flow and be able to modify it ourselves. This note does not describe how all earlier code was written.
 
-Instead of contacting many people individually, an activity can be created:
+### AI verification record — 22 October 2026
 
-**Football – Saturday at 17:00 – Sports Court – 4/8 participants**
+| AI-supported change | Check and result |
+|---|---|
+| Rewrite the documents in clear English and explain the code. | Compared the descriptions with the repository. Removed claims that reminders, saved data and shared data already work. |
+| Review comments and short interface messages. | Corrected comments about status updates, layout and unverified accessibility. The app's rules were not changed. |
+| Check the edited project. | Android debug build succeeded and all 14 logic tests passed. Local Markdown links were checked. |
 
-Other students can join until the required number of participants is reached.
+Update from the team: the maximum-font check passed on the Medium Phone API 36.1 emulator (22 October 2026). The team also confirmed the manual label check on the same date and emulator: OPEN, FULL, JOINED, CANCELLED and COMPLETED and the main actions are understandable from their text without relying on colour. A greyscale filter was not required. The exact screens covered by the font check still need to be recorded. The team's final reading, full TalkBack/control-size checks and optional iOS testing also remain pending. Automated tests do not replace these checks.
 
-The problem JoinMe addresses is therefore not the lack of activities, but the difficulty of finding other students who want to participate in the same activity at the same time.
+## Team work
 
----
-
-## 3. Evidence
-
-Research concerning international university students identifies loneliness, social isolation and difficulties developing social connections as challenges that can occur when adapting to a new country.
-
-Recent research has also found positive relationships between peer social interaction, students' sense of belonging and psychological well-being among international students. Other research has specifically explored interventions designed to improve social connectedness among international university students.
-
-JoinMe does **not** claim to solve loneliness, improve mental health or prove social effectiveness for international students as a population.
-
-Its goal is deliberately narrower:
-
-**reduce one practical barrier to social interaction by making it easier to find people for simple shared activities.**
-
----
-
-## 4. Target User Group
-
-The primary target group is:
-
-**Adult Erasmus and international students living in a student residence or shared university accommodation.**
-
-The application is particularly relevant for recently arrived students who have not yet established a large social group.
-
-The assessed prototype will not target children and will not require sensitive personal information.
-
----
-
-## 5. Proposed Solution
-
-JoinMe allows students to:
-
-- discover available activities
-- view activity information
-- join or leave an activity
-- create an activity
-- manage activities they created
-- view activities they have joined
-
-The application is activity-oriented rather than profile-oriented.
-
-The central concept is:
-
-**Find something to do together, rather than searching for people to meet.**
-
----
-
-## 6. Core User Stories
-
-### US1 – Discover
-
-> As an Erasmus student, I want to see available activities so that I can find something to do with other students.
-
-### US2 – Join
-
-> As an Erasmus student, I want to join an activity so that I can participate without already knowing the other participants.
-
-### US3 – Create
-
-> As an Erasmus student, I want to create an activity and specify when, where and how many people are needed so that other students can join me.
-
-These three user stories define the main scope of the application.
-
----
-
-## 7. Main End-to-End User Flow
-
-The main assessed flow will be:
-
-**Open JoinMe → Browse Activities → Select Activity → View Details → Join Activity → Activity appears in My Activities**
-
-Example:
-
-**Activities → Table Tennis → Activity Detail → Join → 1/2 becomes 2/2 → FULL → My Activities**
-
-The joined activity must remain stored after the application is closed and restarted.
-
-A secondary flow will be:
-
-**Activities → Create Activity → Select type → Set date/time, location and participants → Create → Activity appears in Activities and My Activities**
-
----
-
-## 8. Main Screens
-
-The planned application contains four principal areas.
-
-### 1. Activities
-
-Main screen showing available activities.
-
-Example categories:
-
-- All
-- Sports
-- Games
-- Social
-- Today
-
-Each activity card will show:
-
-- activity type
-- date/time
-- location
-- participants
-- current status
-
-### 2. Activity Detail
-
-Shows:
-
-- activity name
-- date and time
-- location
-- number of participants
-- optional short description
-- current status
-- Join / Leave action
-
-### 3. Create / Edit Activity
-
-The user can create an activity by selecting:
-
-- activity type
-- date
-- start time
-- approximate duration
-- location
-- maximum participants
-- optional short description
-
-### 4. My Activities
-
-Shows activities:
-
-- created by the user
-- joined by the user
-- upcoming
-- completed
-
-The visual prototype will be implemented directly using **Compose Multiplatform**, allowing the same UI code to evolve into the final application instead of creating a disposable prototype.
-
----
-
-## 9. Activity Types
-
-To make activity creation fast and simple, JoinMe will provide predefined activity types.
-
-### Sports
-
-- Football
-- Padel
-- Badminton
-
-### Games
-
-- Table Tennis
-- Pool
-- Table Football
-- Darts
-- Board Games
-- Cards
-
-### Social
-
-- Movie Night
-
-### Other
-
-A custom activity can be created if the required activity is not available in the predefined list.
-
----
-
-## 10. Locations
-
-JoinMe will not require GPS or precise user location.
-
-Instead, common residence locations can be selected from predefined options such as:
-
-- Common Room
-- Games Room
-- Sports Court
-- Cinema Room
-- Garden
-- Entrance
-- Other
-
-This keeps the interaction simple while avoiding unnecessary collection of precise location information.
-
----
-
-## 11. Activity States
-
-Activities will have simple and explicit states:
-
-**OPEN**  
-Other users can still join.
-
-**FULL**  
-The maximum number of participants has been reached.
-
-**CANCELLED**  
-The creator cancelled the activity.
-
-**COMPLETED**  
-The activity date has passed.
-
-The activity creator counts automatically as the first participant.
-
-Example:
-
-A user creates a two-player Table Tennis activity.
-
-The initial state is:
-
-**1 / 2 – OPEN**
-
-When another user joins:
-
-**2 / 2 – FULL**
-
----
-
-## 12. Additional MVP Behaviour
-
-In addition to the three core user stories, the MVP may include:
-
-- Leave an activity
-- Edit an activity created by the user
-- Cancel an activity created by the user
-- Filter activities
-- Display upcoming and previous activities
-- Warn about conflicting activity times
-- Remind users about an upcoming activity
-
-These features extend the central flow without turning JoinMe into a social network.
-
----
-
-## 13. Scope
-
-### IN SCOPE
-
-- Browse activities
-- Activity details
-- Create activities
-- Edit own activities
-- Cancel own activities
-- Join activities
-- Leave activities
-- My Activities
-- Predefined categories
-- Simple filters
-- Predefined locations
-- Activity states
-- Persistent local data
-- Remote data synchronization
-- Offline access to previously stored information
-- Network loading/error states
-- Simple local activity reminder
-- Android application
-- iOS build using the shared Kotlin Multiplatform codebase
-
-### OUT OF SCOPE
-
-- Chat
-- Private messaging
-- Friends
-- Followers
-- Social-media profiles
-- Photographs
-- Camera
-- GPS
-- Maps
-- Precise location tracking
-- Payments
-- Ratings
-- Reviews
-- Likes
-- AI recommendations
-- Matching algorithms
-- Complex authentication
-- Continuous tracking
-
-These exclusions are deliberate to ensure the project remains achievable within the allocated workload.
-
----
-
-## 14. Technical Approach
-
-JoinMe will be developed using:
-
-**Kotlin Multiplatform (KMP)**  
-Shared application logic between Android and iOS.
-
-**Compose Multiplatform**  
-Shared user interface components and screens.
-
-**Supabase**  
-Remote Backend as a Service used to store and synchronize shared activity information.
-
-**Room**  
-Local persistent database used to store activities on the device.
-
-The intended data flow is:
-
-**Compose UI → ViewModel → Repository → Room / Supabase**
-
-Supabase represents the remote shared data source.
-
-Room represents the local persistent copy.
-
-When connectivity is available, data can be synchronized with Supabase.
-
-When connectivity is unavailable, JoinMe can continue displaying previously stored information from Room.
-
----
-
-## 15. Target Platforms
-
-Development and testing will initially focus on **Android**.
-
-This allows the team to implement and validate the complete application flow before introducing additional platform-specific complexity.
-
-Because the project uses Kotlin Multiplatform and Compose Multiplatform, the shared application will also target **iOS**.
-
-Once the Android version is stable, the iOS target will be built and tested using:
-
-**macOS + Xcode**
-
-The Android implementation remains the primary assessed development target unless otherwise required, while the iOS version demonstrates the multiplatform nature of the project.
-
----
-
-## 16. Networking and Offline Behaviour
-
-JoinMe will use Supabase to retrieve and update activity data.
-
-The application should explicitly demonstrate:
-
-**Loading**
-
-The app is requesting current activities.
-
-**Success**
-
-Current activities are received and stored locally.
-
-**Failure / Offline**
-
-The remote request cannot be completed.
-
-In this situation, JoinMe will display previously stored information with a message such as:
-
-> You're offline. Showing saved activities.
-
-This allows the application to remain useful even when connectivity is temporarily unavailable.
-
----
-
-## 17. Persistent Data
-
-Meaningful information must survive an application restart.
-
-For example:
-
-1. A user joins Table Tennis.
-2. The activity is stored locally.
-3. The application is completely closed.
-4. The application is opened again.
-5. Table Tennis still appears under My Activities.
-
-Room will provide the local persistent storage required for this behaviour.
-
----
-
-## 18. Mobile Capability
-
-JoinMe will use **local notifications** as its justified mobile capability.
-
-Example:
-
-> Table Tennis starts in 30 minutes.
-
-Notifications support the purpose of JoinMe because users may create or join an activity several hours or days before it begins.
-
-If notification permission is unavailable or denied, the main application remains fully functional.
-
-The fallback behaviour will be:
-
-> Notifications are disabled. Upcoming activities are still available in My Activities.
-
-No core feature will depend on notification permission.
-
----
-
-## 19. Accessibility Requirements
-
-Two explicit accessibility requirements will be implemented and tested.
-
-### Requirement 1 – Scalable Text
-
-The complete main flow must remain usable when the system text/font size is increased.
-
-Important information and actions must not become hidden or unusable.
-
-### Requirement 2 – Information Must Not Depend Only on Colour
-
-Activity states must always include explicit text.
-
-For example:
-
-**OPEN**  
-**FULL**  
-**JOINED**  
-**CANCELLED**
-
-Colour may reinforce the status but will never be its only representation.
-
-Interactive elements will also use appropriate labels and sufficiently large touch targets.
-
----
-
-## 20. Data, Privacy and Safety
-
-JoinMe is intended for adult university students.
-
-The prototype does not require:
-
-- health information
-- precise location history
-- financial information
-- information about children
-- private conversations
-- sensitive personal information
-
-During development and testing, synthetic activity data can be used.
-
-A minimal technical user identifier may be used internally to distinguish created and joined activities without requiring a complex public user profile.
-
-Locations will refer to shared or predefined places rather than private addresses or continuously tracked positions.
-
----
-
-## 21. Social Impact Limitations
-
-JoinMe may make it easier for students to discover opportunities for social interaction.
-
-However, the project will not claim that JoinMe:
-
-- solves loneliness
-- improves mental health
-- guarantees friendships
-- improves Erasmus integration for the wider student population
-
-The usability evaluation conducted for the course assesses the usability of the prototype, not the effectiveness of the application as a social intervention.
-
----
-
-## 22. Planned Usability Evaluation
-
-Two voluntary usability sessions will be conducted with consenting adult peers who are not members of the development team.
-
-Example tasks may include:
-
-**Task 1**
-
-> You want to play table tennis this evening. Find an available activity and join it.
-
-**Task 2**
-
-> You want to organise a football activity for eight people tomorrow. Create the activity.
-
-Anonymous observations will be recorded.
-
-The final evidence will include:
-
-- usability problems observed
-- limitations of the sessions
-- at least two improvements or justified decisions not to make a change
-
----
-
-## 23. Planned Testing
-
-At least three meaningful automated logic tests will be implemented.
-
-Examples include:
-
-- a participant can join an activity with available capacity
-- a participant cannot join an activity that is full
-- joining an activity updates the participant count and changes its state to FULL when capacity is reached
-- leaving an activity reduces the participant count
-- conflicting activity times are correctly detected
-
-A short manual scenario matrix will also cover:
-
-- normal user flow
-- network failure/offline mode
-- application restart
-- increased accessibility font size
-
----
-
-## 24. Team and Development Process
-
-The project team consists of:
-
-**Nico**  
-**Jaime**
-
-Both members will contribute directly to the implementation.
-
-Development will use a shared Git repository with small commits and feature-based work.
-
-Individual contributions will be identifiable through:
-
-- Git commits
-- branches / pull requests where appropriate
-- feature ownership
-- contribution notes
-
-Both team members should understand the complete application architecture and main data flow in preparation for the individual defence.
-
----
-
-## 25. Prototype Strategy
-
-The M1 prototype will not be developed as a separate disposable HTML, website or design project.
-
-Instead, the team will create the actual **Kotlin Multiplatform + Compose Multiplatform project**.
-
-For M1, it will initially contain:
-
-- real navigation
-- reusable Compose UI
-- sample/fake activities
-- the four main screens
-- representative states such as OPEN and FULL
-
-It will initially exclude:
-
-- complete Supabase integration
-- complete Room persistence
-- final networking
-- final notifications
-
-The same prototype code will then progressively become the M2 working application.
-
-This reduces duplicated work and ensures that effort invested during M1 contributes directly to the final product.
-
----
-
-## 26. MVP Success Criteria
-
-The main project objective is achieved when a user can:
-
-1. Open JoinMe
-2. Browse available activities
-3. Select an activity
-4. Join it
-5. See its participant count update
-6. Find it under My Activities
-7. Close the application
-8. Reopen it
-9. Still see the joined activity
-
-The application must also provide useful behaviour when network connectivity is unavailable.
-
----
-
-## 27. Final Project Principle
-
-JoinMe will prioritise one polished, understandable and reliable activity flow over a large number of partially implemented social features.
-
-The project is not intended to become a social network.
-
-Its purpose is simple:
-
-**Help a student find people to do something with.**
+Nicolás and Jaime worked together on the design, implementation, documentation and checks, with AI support. Both share responsibility for understanding the full main flow and preparing the demonstration. Individual contribution notes will describe their work together and each member's contributions.

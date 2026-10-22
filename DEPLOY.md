@@ -1,247 +1,120 @@
-# JoinMe – Guía para arrancar el proyecto
+# JoinMe — Setup and demo guide
 
-Guía paso a paso para levantar JoinMe en tu ordenador con **IntelliJ IDEA** y probarlo en un emulador Android.
-Tiempo aproximado la primera vez: 30–45 min (la mayor parte son descargas).
+Run commands from the folder containing `settings.gradle.kts`.
 
----
+## 1. Tools and versions
 
-## 0. Qué vas a necesitar
+Use an Android development environment with SDK Manager and Device Manager. The team uses IntelliJ IDEA with Android support. Android Studio is another option for the Android target.
 
-| Herramienta | Versión | Para qué |
-|---|---|---|
-| IntelliJ IDEA (Ultimate o Community) | 2026.1 o superior | Editar y ejecutar el proyecto |
-| Plugin **Android** de IntelliJ | el que trae IntelliJ | Configuraciones "Android App", emulador, SDK |
-| JDK | **21** (p. ej. Amazon Corretto 21) | Ejecutar Gradle |
-| Android SDK Platform | **Android 37** (API 37) | Compilar (`compileSdk = 37`) |
-| Android SDK Build-Tools | **37.0.0** | Compilar el APK |
-| Android SDK Platform-Tools | última | `adb` |
-| Android Emulator | última | Emulador |
-| Imagen del emulador | **Android 36** (API 36), Google APIs | Ver nota del paso 6 |
-| Git | cualquiera | Clonar el repositorio |
+| Setting | Value in this project |
+|---|---|
+| Gradle wrapper | 9.5.1 |
+| Gradle daemon JDK | Azul JDK 21, selected in `gradle/gradle-daemon-jvm.properties` |
+| Kotlin / Compose Multiplatform | 2.4.20 / 1.12.1 |
+| Android Gradle Plugin | 9.1.1 |
+| Compile / target / minimum SDK | API 37 / API 37 / API 24 |
+| Existing screenshot device | Pixel 8 emulator, Android 16 (API 36) |
 
-No hay que instalar nada a mano dentro del proyecto: Gradle descarga solo las librerías
-(Kotlin 2.4.20, Compose Multiplatform 1.12.1, AGP 9.1.1, Gradle 9.5.1...).
+Versions are in `gradle/libs.versions.toml`. The first build needs internet access for downloads. Use the included Gradle wrapper.
 
-**Ordenador:** 16 GB de RAM recomendados (el emulador consume bastante) y ~10 GB libres de disco.
-La virtualización tiene que estar activada (VT-x/AMD-V en la BIOS; en Linux, que exista `/dev/kvm`).
+## 2. Open and configure the project
 
----
+Clone if needed:
 
-## 1. Clonar el repositorio
-
-```bash
+```powershell
 git clone https://github.com/nicolasezequielmaqueda/JoinMe.git
+cd JoinMe
 ```
 
-En IntelliJ: **File → Open…** y selecciona la carpeta `JoinMe` (la que contiene `settings.gradle.kts`).
-Si pregunta, elige **Trust Project**.
+Open this folder in the IDE. In SDK Manager, install API 37, Android SDK Build-Tools, Platform-Tools and Android Emulator. In Device Manager, create a Pixel 8 with Android 16 / API 36. Choose an image matching your computer's processor.
 
-> No toques todavía nada aunque salgan errores de Gradle: primero hay que instalar el SDK.
+Select JDK 21 in the IDE's Gradle settings and sync. The included daemon settings select Azul JDK 21. If its download fails, check the error and network connection.
 
----
+The original notes reported a startup problem with one API 37 emulator image. This does not mean all API 37 images fail. API 36 was used for our existing screenshots.
 
-## 2. Activar el plugin de Android
+## 3. Set the SDK path
 
-Si en **Run → Edit Configurations → +** solo te aparece "Kotlin" y no "Android App", el plugin está desactivado.
-
-1. **Settings** (`Ctrl+Alt+S`, en Mac `⌘,`) → **Plugins** → pestaña **Installed**.
-2. Busca **Android** y actívalo. Si aparecen "Android Design Tools" o "Jetpack Compose", actívalos también.
-3. (Opcional) En **Marketplace** instala **Kotlin Multiplatform** (de JetBrains).
-4. Reinicia IntelliJ.
-
----
-
-## 3. Instalar el Android SDK
-
-### Opción A – Desde IntelliJ (recomendada)
-
-1. **Settings → Languages & Frameworks → Android SDK**.
-2. **Android SDK Location**: deja la ruta por defecto o pon una tuya
-   (Linux: `~/Android/Sdk`, Mac: `~/Library/Android/sdk`, Windows: `C:\Users\<tú>\AppData\Local\Android\Sdk`).
-   Si no existe, pulsa **Edit** y el asistente lo descarga.
-3. Pestaña **SDK Platforms**: marca **Android 37**.
-4. Pestaña **SDK Tools** (marca *Show Package Details* si hace falta) y marca:
-   - Android SDK Build-Tools → **37.0.0**
-   - **Android SDK Platform-Tools**
-   - **Android Emulator**
-   - **Android SDK Command-line Tools (latest)**
-5. **Apply** y acepta las licencias.
-
-### Opción B – Por terminal (Linux, si la opción A falla)
-
-```bash
-# 1. Descargar las command-line tools
-mkdir -p ~/Android/Sdk/cmdline-tools && cd /tmp
-curl -LO https://dl.google.com/android/repository/commandlinetools-linux-16111833_latest.zip
-unzip commandlinetools-linux-*_latest.zip
-mv cmdline-tools ~/Android/Sdk/cmdline-tools/latest
-
-# 2. Aceptar licencias e instalar los paquetes
-export ANDROID_HOME=~/Android/Sdk
-yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
-$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install \
-  "platform-tools" "platforms/android-37.0" "build-tools/37.0.0" "emulator" \
-  "system-images/android-36/google_apis/x86_64"
-```
-
-> Las versiones nuevas de `sdkmanager` usan `/` en los nombres de paquete (`platforms/android-37.0`),
-> las antiguas usan `;` (`platforms;android-37`).
-
----
-
-## 4. Decirle al proyecto dónde está el SDK
-
-En la raíz del proyecto debe existir el fichero **`local.properties`** con la ruta del SDK.
-IntelliJ suele crearlo solo al sincronizar; si no, créalo tú:
+The IDE may create `local.properties`. Otherwise, create it in the project root using your real SDK path. Windows example:
 
 ```properties
-# Linux
-sdk.dir=/home/<tu-usuario>/Android/Sdk
-# Mac
-# sdk.dir=/Users/<tu-usuario>/Library/Android/sdk
-# Windows (barras dobles)
-# sdk.dir=C\:\\Users\\<tu-usuario>\\AppData\\Local\\Android\\Sdk
+sdk.dir=C:/Users/YOUR_USER/AppData/Local/Android/Sdk
 ```
 
-Este fichero está en `.gitignore`: cada uno tiene el suyo y **no se sube** al repositorio.
+On macOS or Linux, use the path shown in SDK Manager. Git ignores this file because each computer can use a different path. You can also set `ANDROID_HOME` in the terminal running Gradle. Remember that a setting made in one terminal may not be available in another.
 
----
+## 4. Build and run
 
-## 5. JDK de Gradle y sincronizar
+Start the emulator. Select an Android App run configuration for `androidApp` and press Run. The exact module label depends on the IDE.
 
-1. **Settings → Build, Execution, Deployment → Build Tools → Gradle**.
-2. **Gradle JVM** → elige un **JDK 21** (si no tienes, *Download JDK…* → versión 21, p. ej. Amazon Corretto).
-3. Pulsa el icono del elefante **Sync Gradle Changes** (o *Reload All Gradle Projects* en la ventana Gradle).
+Build from PowerShell:
 
-La primera sincronización tarda unos minutos. Al terminar no debe haber errores rojos en la ventana *Build*.
-
-En Linux/Mac, si al usar la terminal sale `Permission denied` con `./gradlew`:
-
-```bash
-chmod +x gradlew
+```powershell
+.\gradlew.bat :androidApp:assembleDebug
 ```
 
----
+APK output: `androidApp/build/outputs/apk/debug/androidApp-debug.apk`.
 
-## 6. Crear el emulador
+Install on a running emulator or connected device:
 
-1. **View → Tool Windows → Device Manager** → **+** → **Create Virtual Device**.
-2. Teléfono: **Pixel 8** (o cualquier Pixel).
-3. Imagen del sistema: **Android 36 (API 36) – Google APIs – x86_64**
-   (en Mac con chip Apple: la versión **arm64-v8a**).
-4. Nombre: por ejemplo `JoinMe_Pixel` → **Finish**.
+```powershell
+.\gradlew.bat :androidApp:installDebug
+```
 
-> ⚠️ **No uses la imagen de Android 37 para el emulador.** Con la versión actual (octubre 2026) se queda
-> en pantalla negra: el sistema Android falla al arrancar (`Invalid feature flag ... aapm_feature_disable_insecure_wifi_autojoin`).
-> La app compila contra Android 37 pero funciona perfectamente en un emulador Android 36.
+Open JoinMe from the device's app list. On macOS or Linux, use `./gradlew`. If needed, run `chmod +x gradlew` first.
 
----
+## 5. Demo steps
 
-## 7. Crear la configuración de ejecución y lanzar la app
+Start with a fresh app process to reset the sample data. Returning to the home screen may leave it running. Use Force stop in Android's app settings if necessary, then reopen JoinMe.
 
-1. **Run → Edit Configurations…** → **+** → **Android App**.
-2. Rellena:
-   - **Name:** `androidApp`
-   - **Module:** `JoinMe.androidApp.main`
-   - **Launch:** `Default Activity`
-3. **OK**.
-4. Arriba, en el selector de dispositivos, elige `JoinMe_Pixel`.
-5. Pulsa **▶ Run** (`Shift+F10`).
-
-La primera vez el emulador tarda 1–2 minutos en arrancar. Después se abre JoinMe solo.
-
----
-
-## 8. Qué probar (flujo principal)
-
-| Paso | Qué debería pasar |
+| Action | Expected result |
 |---|---|
-| Abrir la app | Pantalla **Activities** con la fecha de hoy y varias actividades de ejemplo |
-| Pulsar **Table Tennis** | Detalle con `1 of 2 people`, estado `OPEN` y botón **Join activity** |
-| Pulsar **Join activity** | Pasa a `2 of 2`, estados `FULL` + `JOINED`, mensaje "You joined this activity!" y el botón cambia a **Leave activity** |
-| Pestaña **My Activities** | Table Tennis aparece en **Joined** |
-| **+ New** en Activities | Formulario: elige tipo, fecha, hora y lugar → se activa **Create activity** |
-| Crear la actividad | Se abre su detalle y aparece en **My Activities → Created by you** |
-| Abrir **Board Games** (creada por ti) | Botón **Cancel activity** con confirmación |
+| Open Table Tennis | Today at 23:00, Games Room, 1 of 2 people, OPEN. |
+| Press Join activity | 2 of 2, FULL and JOINED; Leave activity is available. |
+| Go back, then open My Activities | Table Tennis appears under Joined. |
+| Leave Table Tennis | The count returns to 1 of 2 and OPEN. |
+| Press New and complete the form | A future time and required fields enable Create activity. |
+| Create the activity | Its details open; it appears under Created by you. |
+| Cancel Board Games and confirm | It appears in My Activities → Past as CANCELLED. |
 
-> Los datos son de ejemplo y se guardan **solo en memoria** (M1): al cerrar la app del todo se reinician.
-> La persistencia con Room y Supabase llega en M2.
+M1 data resets after a process restart. This is a known prototype limit, not the intended final behaviour.
 
-**Accesibilidad:** en el emulador, *Settings → Display → Font size* al máximo y repetir el flujo: todo debe seguir visible y usable.
+## 6. Automated tests
 
----
-
-## 9. Ejecutar los tests
-
-Desde IntelliJ: ventana **Gradle** → `JoinMe → shared → Tasks → verification → testAndroidHostTest` (doble clic).
-
-O desde la terminal del proyecto:
-
-```bash
-./gradlew :shared:testAndroidHostTest
+```powershell
+.\gradlew.bat :shared:testAndroidHostTest
 ```
 
-Debe terminar con **BUILD SUCCESSFUL** (14 tests: `ActivityRulesTest` y `ActivityValidatorTest`).
+There are 14 tests in `ActivityRulesTest` and `ActivityValidatorTest`. The report is in `shared/build/reports/tests/testAndroidHostTest/index.html`. These check rules and validation, not visual layout.
 
----
+## 7. Accessibility checks
 
-## 10. Plan B: lanzar sin la configuración de IntelliJ
+Set Android's Font size to maximum. Repeat the join task and create an activity. Check for overlapping text, unreadable information or actions you cannot reach. Scrolling is acceptable.
 
-```bash
-~/Android/Sdk/emulator/emulator -avd JoinMe_Pixel &          # arrancar el emulador
-./gradlew :androidApp:installDebug                           # compilar e instalar
-~/Android/Sdk/platform-tools/adb shell am start -n com.joinme/.MainActivity   # abrir la app
-```
+For the colour requirement, keep the normal display settings and manually check the labels:
 
-También puedes usar un **móvil real**: activa *Opciones de desarrollador → Depuración USB*, conéctalo por USB
-y aparecerá en el selector de dispositivos de IntelliJ.
+- Open Table Tennis: identify OPEN and the Join activity action from their text.
+- Join Table Tennis: identify FULL, JOINED and Leave activity from their text. Pool also provides a FULL example.
+- Open My Activities → Past: identify COMPLETED on Darts.
+- Cancel Board Games and open it under Past: identify CANCELLED.
 
----
+Pass this check only if each status can be explained using its visible text, without referring to its colour, and the main actions have clear labels. Record any missing, hidden or unclear label. A greyscale filter is optional for this check.
 
-## 11. iOS (solo con Mac)
+Menu names depend on the Android version. Record the device, version, settings, result and any problem. Save useful screenshots. The team reports that maximum font size works well on the Medium Phone API 36.1 emulator (22 October 2026). On the same date and emulator, the team confirmed that OPEN, FULL, JOINED, CANCELLED and COMPLETED and the main action labels are visible and understandable without relying on colour. TalkBack and control-size checks are additional work. See the [supporting notes](docs/m1/M1-details.md).
 
-1. Instala **Xcode** desde la App Store.
-2. Abre `iosApp/iosApp.xcodeproj` con Xcode.
-3. En `iosApp/Configuration/Config.xcconfig` pon tu `TEAM_ID` (solo hace falta para un iPhone real; el simulador no lo necesita).
-4. Elige un simulador de iPhone y pulsa **Run**. Xcode compila primero el código compartido de Kotlin.
+## 8. Optional iOS build
 
-En Linux y Windows no se puede compilar iOS: es normal ver el aviso de que las tareas de iOS están desactivadas.
+The iOS project has not been verified in this Windows review. On a Mac with Xcode, open `iosApp/iosApp.xcodeproj` and select an iPhone simulator. For a physical iPhone, configure signing and the team ID in `iosApp/Configuration/Config.xcconfig`. Test it before claiming that iOS works.
 
----
+## 9. Common problems
 
-## 12. Problemas frecuentes
-
-| Problema | Solución |
+| Problem | What to check |
 |---|---|
-| `SDK location not found` | Falta `local.properties` o la ruta está mal (paso 4) |
-| En *Edit Configurations* solo sale "Kotlin" | Activar el plugin Android (paso 2) |
-| `Unsupported class file major version` / errores raros de Gradle | Gradle JVM no es JDK 21 (paso 5) |
-| `./gradlew: Permission denied` | `chmod +x gradlew` |
-| Emulador en pantalla negra que nunca arranca | Estás usando la imagen Android 37: crea el emulador con Android 36 (paso 6) |
-| Aviso "Suggested minimum system RAM…" | Es solo un aviso. Cierra programas pesados si va lento |
-| El emulador no arranca en Linux | Comprueba que existe `/dev/kvm` y que tu usuario puede usarlo |
-| Cambios en el código que no se ven | Vuelve a pulsar **Run**; si sigue igual, *Build → Clean Project* y Run |
+| SDK location not found | Check `local.properties` or `ANDROID_HOME` in the terminal running Gradle. |
+| Missing SDK platform | Install the platform requested by the build error. |
+| No Android run configuration | Check IDE Android support and Gradle sync. |
+| JDK error | Read the first error and check the daemon JDK settings. |
+| Emulator does not start | Check virtualisation and the image; try the API 36 setup used for the screenshots. |
+| No device found | Start the emulator, or connect a phone with USB debugging enabled. |
+| Changes are missing | Rerun after code changes. M1 data resets after a process restart. |
 
----
-
-## 13. Estructura del código (para orientarte)
-
-```
-shared/src/commonMain/kotlin/com/joinme/
-├── App.kt                 Punto de entrada de la UI (Android e iOS)
-├── model/                 Datos: Activity, ActivityType, ActivityStatus, ResidenceLocation...
-├── domain/                Reglas: ActivityRules (join/leave/cancel/estado), ActivityValidator
-├── data/                  ActivityRepository + FakeActivityRepository (datos de ejemplo en memoria)
-├── util/                  Fechas y horas
-└── ui/
-    ├── theme/             Colores, tipografía (Inter), tema claro/oscuro
-    ├── icons/             Todos los iconos (Phosphor) en un único fichero
-    ├── components/        Piezas reutilizables: tarjetas, botones, pills, secciones...
-    ├── navigation/        Rutas, navegación y barra de pestañas
-    └── screens/           Una carpeta por pantalla, cada una con su ViewModel
-shared/src/commonTest/     Tests de las reglas de negocio
-androidApp/                MainActivity (solo arranca App())
-iosApp/                    Proyecto Xcode (solo arranca App())
-```
-
-Flujo de datos: **Pantalla (Compose) → ViewModel → Repository → (M2: Room / Supabase)**.
+See [CONTEXT.md](CONTEXT.md) for an explanation of the code.

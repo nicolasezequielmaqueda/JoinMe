@@ -4,7 +4,7 @@ package com.joinme.model
  * Predefined activity types, so creating an activity only takes a few taps.
  *
  * [defaultParticipants] is the suggested maximum when the user picks this type.
- * [emoji] is only decorative; the name is always shown next to it.
+ * [emoji] is stored with the type; the current screens use AppIcons instead.
  */
 enum class ActivityType(
     val displayName: String,

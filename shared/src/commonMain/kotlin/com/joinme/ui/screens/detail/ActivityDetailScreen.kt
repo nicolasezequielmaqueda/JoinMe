@@ -84,7 +84,7 @@ fun ActivityDetailScreen(
         contentWindowInsets = WindowInsets(0.dp),
         topBar = { NavBar(title = "", onBack = onBack) },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        // The action stays at the bottom, always easy to reach with the thumb.
+        // Keep the main action at the bottom of the screen.
         bottomBar = {
             if (item != null) {
                 ActionArea(
@@ -116,7 +116,7 @@ private fun DetailContent(item: ActivityItem, modifier: Modifier = Modifier) {
     val colors = JoinMeTheme.colors
     val endTime = ActivityRules.endOf(activity).time
 
-    // verticalScroll keeps everything reachable with very big fonts.
+    // Allow scrolling when the content is taller than the screen.
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -215,9 +215,9 @@ private fun spotsText(item: ActivityItem): String {
     return when {
         item.status == ActivityStatus.CANCELLED -> "This activity was cancelled."
         item.status == ActivityStatus.COMPLETED -> "This activity has finished."
-        free <= 0 -> "No spots left."
-        free == 1 -> "1 spot left. You could be the one!"
-        else -> "$free spots left."
+        free <= 0 -> "No places left."
+        free == 1 -> "1 place left."
+        else -> "$free places left."
     }
 }
 

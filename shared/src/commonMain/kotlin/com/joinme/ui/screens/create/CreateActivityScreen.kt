@@ -212,7 +212,7 @@ fun CreateActivityScreen(
             FormTextField(
                 value = form.description,
                 onValueChange = viewModel::onDescriptionChange,
-                placeholder = "E.g. any level is welcome. No personal information.",
+                placeholder = "Any level is welcome. Do not include personal information.",
                 singleLine = false,
             )
             Text(
@@ -244,7 +244,7 @@ fun CreateActivityScreen(
 
 /**
  * Grid of activity types (4 per row). Unselected types are grey; the selected
- * one shows the colour of its category and a border, so the choice is obvious.
+ * one shows the colour of its category and a border.
  */
 @Composable
 private fun TypeGrid(selected: ActivityType?, onSelect: (ActivityType) -> Unit) {
@@ -352,7 +352,7 @@ private fun StepperButton(icon: ImageVector, description: String, enabled: Boole
     )
 }
 
-/** Text field with a white rounded background and no underline. */
+/** Text field with a rounded background and no underline. */
 @Composable
 private fun FormTextField(value: String, onValueChange: (String) -> Unit, placeholder: String, singleLine: Boolean) {
     val colors = JoinMeTheme.colors

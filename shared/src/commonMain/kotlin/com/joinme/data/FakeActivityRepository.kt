@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.datetime.LocalDateTime
 
 /**
- * In-memory repository for the M1 prototype. Data is lost when the app closes.
+ * Stores M1 activities in memory. Changes are lost when the app process ends.
  *
  * @param now gives the current time. It can be replaced in tests.
  */

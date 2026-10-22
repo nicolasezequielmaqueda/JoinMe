@@ -23,7 +23,7 @@ import com.joinme.ui.theme.JoinMeTheme
 
 /**
  * Rounded option that can be selected (filters, duration, location).
- * Selected = accent colour with white text, so it is clear without reading.
+ * The selected option uses the accent colour and exposes its selected state.
  */
 @Composable
 fun SelectablePill(

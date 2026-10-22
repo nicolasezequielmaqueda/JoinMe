@@ -22,8 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.joinme.ui.theme.JoinMeTheme
 
 /**
- * iOS style segmented control: a grey capsule where the selected option
- * is a white rounded "pill".
+ * A row of options with a rounded background around the selected option.
  */
 @Composable
 fun SegmentedControl(

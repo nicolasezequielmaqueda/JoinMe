@@ -7,7 +7,7 @@ import kotlinx.datetime.LocalTime
  * An activity that students can join.
  *
  * The status (OPEN, FULL...) is not stored here. It is calculated from the
- * other fields in ActivityRules, so it can never be out of date.
+ * other fields and a given time in ActivityRules whenever it is needed.
  *
  * @property customName only used when [type] is [ActivityType.OTHER].
  * @property participantIds technical user ids. The creator is always the first one.

@@ -6,13 +6,13 @@ import com.joinme.model.NewActivityForm
 import kotlinx.coroutines.flow.StateFlow
 
 /**
- * Single entry point to the activity data for the ViewModels.
+ * The ViewModels use this interface to read and change activities.
  *
  * M1: FakeActivityRepository keeps everything in memory.
- * M2: a new implementation will use Room (local copy) and Supabase (remote),
- * and the ViewModels will not need to change.
+ * Plan for M2: use Room to save data on the phone and Supabase to share it.
+ * Keeping this interface should reduce the changes needed in the ViewModels.
  *
- * The functions are "suspend" because in M2 they will make network calls.
+ * The functions are "suspend" so they can later wait for database or network work.
  */
 interface ActivityRepository {
 

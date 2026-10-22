@@ -25,8 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.joinme.ui.theme.JoinMeTheme
 
 /**
- * White rounded block that groups several rows, like the "inset grouped"
- * lists of iOS Settings.
+ * Rounded background that groups several information rows.
  */
 @Composable
 fun GroupedSection(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
@@ -42,7 +41,7 @@ fun GroupedSection(modifier: Modifier = Modifier, content: @Composable () -> Uni
 
 /**
  * One row of a GroupedSection: icon, label on the left and value on the right.
- * The value moves under the label if there is not enough space (big fonts).
+ * The value uses the remaining width and can wrap onto several lines.
  */
 @Composable
 fun InfoRow(icon: ImageVector, label: String, value: String, showDivider: Boolean = true) {
