@@ -28,7 +28,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.joinme.data.AppContainer
+import com.joinme.data.ActivityRepository
 import com.joinme.ui.components.ActivityCard
 import com.joinme.ui.components.EmptyState
 import com.joinme.ui.components.LargeTitleHeader
@@ -44,7 +44,9 @@ import com.joinme.util.DateTimeUtils
 fun ActivitiesScreen(
     onActivityClick: (String) -> Unit,
     onCreateClick: () -> Unit,
-    viewModel: ActivitiesViewModel = viewModel { ActivitiesViewModel(AppContainer.activityRepository) },
+    repository: ActivityRepository,
+    storageMessage: String?,
+    viewModel: ActivitiesViewModel = viewModel { ActivitiesViewModel(repository) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -53,6 +55,13 @@ fun ActivitiesScreen(
             title = "Activities",
             overline = DateTimeUtils.formatLongDate(DateTimeUtils.today()),
             action = { NewButton(onClick = onCreateClick) },
+        )
+
+        Text(
+            text = storageMessage ?: "Demo activities · Fictional people and places",
+            style = MaterialTheme.typography.bodySmall,
+            color = JoinMeTheme.colors.textSecondary,
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
         )
 
         FilterRow(

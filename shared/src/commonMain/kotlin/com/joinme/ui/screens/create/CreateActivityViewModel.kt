@@ -25,6 +25,7 @@ import kotlinx.datetime.LocalTime
 data class CreateActivityUiState(
     val form: NewActivityForm = NewActivityForm(),
     val validationError: String? = null,
+    val saveError: String? = null,
     val isSaving: Boolean = false,
     val createdActivityId: String? = null,
 ) {
@@ -76,12 +77,12 @@ class CreateActivityViewModel(private val repository: ActivityRepository) : View
         if (!state.canCreate) return
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isSaving = true) }
+            _uiState.update { it.copy(isSaving = true, saveError = null) }
             when (val result = repository.createActivity(state.form, CurrentUser.ID)) {
                 is ActivityResult.Success ->
                     _uiState.update { it.copy(isSaving = false, createdActivityId = result.activity.id) }
                 is ActivityResult.Error ->
-                    _uiState.update { it.copy(isSaving = false, validationError = result.message) }
+                    _uiState.update { stateFor(it.form).copy(saveError = result.message) }
             }
         }
     }

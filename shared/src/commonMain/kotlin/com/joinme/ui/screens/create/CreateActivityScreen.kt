@@ -51,7 +51,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.joinme.data.AppContainer
+import com.joinme.data.ActivityRepository
 import com.joinme.domain.ActivityValidator
 import com.joinme.model.ActivityType
 import com.joinme.model.ResidenceLocation
@@ -74,7 +74,8 @@ import com.joinme.util.DateTimeUtils
 fun CreateActivityScreen(
     onBack: () -> Unit,
     onActivityCreated: (String) -> Unit,
-    viewModel: CreateActivityViewModel = viewModel { CreateActivityViewModel(AppContainer.activityRepository) },
+    repository: ActivityRepository,
+    viewModel: CreateActivityViewModel = viewModel { CreateActivityViewModel(repository) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val form = uiState.form
@@ -101,7 +102,7 @@ fun CreateActivityScreen(
                     .windowInsetsPadding(WindowInsets.ime.union(WindowInsets.navigationBars))
                     .padding(horizontal = 16.dp, vertical = 12.dp),
             ) {
-                uiState.validationError?.let { error ->
+                (uiState.saveError ?: uiState.validationError)?.let { error ->
                     Text(
                         text = error,
                         style = MaterialTheme.typography.bodyMedium,

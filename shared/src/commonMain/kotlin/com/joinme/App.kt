@@ -1,15 +1,21 @@
 package com.joinme
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import com.joinme.data.ActivityRepository
+import com.joinme.data.LocalActivityRepository
+import com.joinme.data.WeatherSource
 import com.joinme.ui.navigation.AppNavigation
 import com.joinme.ui.theme.JoinMeTheme
 
-/**
- * Entry point of the shared UI. Used by Android (MainActivity) and iOS (MainViewController).
- */
 @Composable
-fun App() {
+fun App(
+    repository: ActivityRepository = remember { LocalActivityRepository() },
+    weather: WeatherSource? = null,
+    shareText: (String) -> Boolean = { false },
+    storageMessage: String? = null,
+) {
     JoinMeTheme {
-        AppNavigation()
+        AppNavigation(repository, weather, shareText, storageMessage)
     }
 }

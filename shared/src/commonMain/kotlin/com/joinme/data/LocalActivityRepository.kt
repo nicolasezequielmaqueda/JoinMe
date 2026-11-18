@@ -9,16 +9,20 @@ import com.joinme.util.DateTimeUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
 
 /**
- * Stores M1 activities in memory. Changes are lost when the app process ends.
+ * Keeps the activity list in memory and saves each change before showing it.
  *
  * @param now gives the current time. It can be replaced in tests.
  */
-class FakeActivityRepository(
+class LocalActivityRepository(
     initialActivities: List<Activity> = SampleActivities.create(DateTimeUtils.today()),
+    private val save: suspend (List<Activity>) -> Boolean = { true },
     private val now: () -> LocalDateTime = { DateTimeUtils.now() },
 ) : ActivityRepository {
 
@@ -26,14 +30,17 @@ class FakeActivityRepository(
     override val activities: StateFlow<List<Activity>> = _activities.asStateFlow()
 
     // Simple counter to give each new activity a different id.
-    private var nextId = 1
+    private var nextId = (initialActivities.mapNotNull {
+        it.id.removePrefix("new-").toIntOrNull()
+    }.maxOrNull() ?: 0) + 1
+    private val changes = Mutex()
 
     override fun getActivity(id: String): Activity? =
         _activities.value.find { it.id == id }
 
-    override suspend fun createActivity(form: NewActivityForm, userId: String): ActivityResult {
+    override suspend fun createActivity(form: NewActivityForm, userId: String): ActivityResult = changes.withLock {
         val error = ActivityValidator.validate(form, now())
-        if (error != null) return ActivityResult.Error(error)
+        if (error != null) return@withLock ActivityResult.Error(error)
 
         // The validator already checked these fields, so "!!" cannot fail here.
         val activity = Activity(
@@ -49,8 +56,7 @@ class FakeActivityRepository(
             participantIds = listOf(userId), // the creator is the first participant
             description = form.description.trim(),
         )
-        _activities.update { it + activity }
-        return ActivityResult.Success(activity)
+        saveChange(_activities.value + activity, activity)
     }
 
     override suspend fun joinActivity(activityId: String, userId: String): ActivityResult =
@@ -66,16 +72,26 @@ class FakeActivityRepository(
      * Finds the activity, applies a rule and, if it succeeds,
      * replaces the old activity with the new one in the list.
      */
-    private fun applyChange(activityId: String, rule: (Activity) -> ActivityResult): ActivityResult {
+    private suspend fun applyChange(activityId: String, rule: (Activity) -> ActivityResult): ActivityResult = changes.withLock {
         val activity = getActivity(activityId)
-            ?: return ActivityResult.Error("This activity no longer exists.")
+            ?: return@withLock ActivityResult.Error("This activity no longer exists.")
 
-        val result = rule(activity)
-        if (result is ActivityResult.Success) {
-            _activities.update { list ->
-                list.map { if (it.id == activityId) result.activity else it }
+        when (val result = rule(activity)) {
+            is ActivityResult.Error -> result
+            is ActivityResult.Success -> {
+                val updated = _activities.value.map { if (it.id == activityId) result.activity else it }
+                saveChange(updated, result.activity)
             }
         }
-        return result
     }
+
+    private suspend fun saveChange(updated: List<Activity>, activity: Activity): ActivityResult =
+        withContext(NonCancellable) {
+            if (save(updated)) {
+                _activities.value = updated
+                ActivityResult.Success(activity)
+            } else {
+                ActivityResult.Error("Could not save this change. Please try again.")
+            }
+        }
 }

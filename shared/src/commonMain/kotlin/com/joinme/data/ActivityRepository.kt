@@ -5,18 +5,10 @@ import com.joinme.model.Activity
 import com.joinme.model.NewActivityForm
 import kotlinx.coroutines.flow.StateFlow
 
-/**
- * The ViewModels use this interface to read and change activities.
- *
- * M1: FakeActivityRepository keeps everything in memory.
- * Plan for M2: use Room to save data on the phone and Supabase to share it.
- * Keeping this interface should reduce the changes needed in the ViewModels.
- *
- * The functions are "suspend" so they can later wait for database or network work.
- */
+/** The ViewModels use this interface to read and change activities. */
 interface ActivityRepository {
 
-    /** All activities. The UI observes it and redraws when it changes. */
+    /** The ViewModels use this interface to read and change activities. */
     val activities: StateFlow<List<Activity>>
 
     fun getActivity(id: String): Activity?

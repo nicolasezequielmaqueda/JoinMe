@@ -12,6 +12,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.joinme.data.ActivityRepository
+import com.joinme.data.WeatherSource
 import com.joinme.ui.screens.activities.ActivitiesScreen
 import com.joinme.ui.screens.create.CreateActivityScreen
 import com.joinme.ui.screens.detail.ActivityDetailScreen
@@ -23,7 +25,12 @@ import com.joinme.ui.theme.JoinMeTheme
  * Activities / My Activities (tabs) → Activity Detail, and Activities → Create.
  */
 @Composable
-fun AppNavigation() {
+fun AppNavigation(
+    repository: ActivityRepository,
+    weather: WeatherSource?,
+    shareText: (String) -> Boolean,
+    storageMessage: String?,
+) {
     val navController = rememberNavController()
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     // The tab bar is only shown on the two main screens.
@@ -53,6 +60,8 @@ fun AppNavigation() {
         ) {
             composable(Routes.ACTIVITIES) {
                 ActivitiesScreen(
+                    repository = repository,
+                    storageMessage = storageMessage,
                     onActivityClick = { id -> navController.navigate(Routes.detail(id)) },
                     onCreateClick = { navController.navigate(Routes.CREATE) },
                 )
@@ -60,6 +69,7 @@ fun AppNavigation() {
 
             composable(Routes.MY_ACTIVITIES) {
                 MyActivitiesScreen(
+                    repository = repository,
                     onActivityClick = { id -> navController.navigate(Routes.detail(id)) },
                 )
             }
@@ -68,11 +78,17 @@ fun AppNavigation() {
                 route = Routes.DETAIL,
                 arguments = listOf(navArgument(Routes.ARG_ACTIVITY_ID) { type = NavType.StringType }),
             ) {
-                ActivityDetailScreen(onBack = { navController.popBackStack() })
+                ActivityDetailScreen(
+                    repository = repository,
+                    weather = weather,
+                    shareText = shareText,
+                    onBack = { navController.popBackStack() },
+                )
             }
 
             composable(Routes.CREATE) {
                 CreateActivityScreen(
+                    repository = repository,
                     onBack = { navController.popBackStack() },
                     onActivityCreated = { id ->
                         // Open the new activity and remove the form from the back stack,

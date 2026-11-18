@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.joinme.data.AppContainer
+import com.joinme.data.ActivityRepository
 import com.joinme.ui.components.ActivityCard
 import com.joinme.ui.components.ActivityItem
 import com.joinme.ui.components.EmptyState
@@ -36,7 +36,8 @@ private val TABS = listOf("Upcoming", "Past")
 @Composable
 fun MyActivitiesScreen(
     onActivityClick: (String) -> Unit,
-    viewModel: MyActivitiesViewModel = viewModel { MyActivitiesViewModel(AppContainer.activityRepository) },
+    repository: ActivityRepository,
+    viewModel: MyActivitiesViewModel = viewModel { MyActivitiesViewModel(repository) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }

@@ -34,9 +34,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.joinme.data.AppContainer
+import com.joinme.data.ActivityRepository
+import com.joinme.data.WeatherSource
 import com.joinme.domain.ActivityRules
 import com.joinme.model.ActivityStatus
+import com.joinme.model.ResidenceLocation
 import com.joinme.ui.components.ActivityIconTile
 import com.joinme.ui.components.ActivityItem
 import com.joinme.ui.components.DestructiveButton
@@ -62,8 +64,11 @@ import com.joinme.util.DateTimeUtils
 @Composable
 fun ActivityDetailScreen(
     onBack: () -> Unit,
+    repository: ActivityRepository,
+    weather: WeatherSource?,
+    shareText: (String) -> Boolean,
     viewModel: ActivityDetailViewModel = viewModel {
-        ActivityDetailViewModel(createSavedStateHandle(), AppContainer.activityRepository)
+        ActivityDetailViewModel(createSavedStateHandle(), repository)
     },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -105,13 +110,18 @@ fun ActivityDetailScreen(
                 modifier = Modifier.padding(innerPadding),
             )
         } else {
-            DetailContent(item = item, modifier = Modifier.padding(innerPadding))
+            DetailContent(item, weather, shareText, Modifier.padding(innerPadding))
         }
     }
 }
 
 @Composable
-private fun DetailContent(item: ActivityItem, modifier: Modifier = Modifier) {
+private fun DetailContent(
+    item: ActivityItem,
+    weather: WeatherSource?,
+    shareText: (String) -> Boolean,
+    modifier: Modifier = Modifier,
+) {
     val activity = item.activity
     val colors = JoinMeTheme.colors
     val endTime = ActivityRules.endOf(activity).time
@@ -182,6 +192,15 @@ private fun DetailContent(item: ActivityItem, modifier: Modifier = Modifier) {
             InfoRow(AppIcons.Duration, "Duration", DateTimeUtils.formatDuration(activity.durationMinutes))
             InfoRow(activity.location.icon, "Place", activity.location.displayName)
             InfoRow(AppIcons.Category, "Category", activity.type.category.displayName, showDivider = false)
+        }
+
+        if (item.status == ActivityStatus.OPEN || item.status == ActivityStatus.FULL) {
+            ActivityInvite(activity, shareText)
+            if (weather != null &&
+                activity.location in listOf(ResidenceLocation.SPORTS_COURT, ResidenceLocation.GARDEN)
+            ) {
+                WeatherPanel(weather)
+            }
         }
 
         if (activity.description.isNotBlank()) {
