@@ -17,6 +17,9 @@ import kotlinx.datetime.plus
  */
 object SampleActivities {
 
+    /** The user of previews and iOS, where there is no sign-in. */
+    const val DEMO_USER_ID = "user-me"
+
     fun create(today: LocalDate): List<Activity> {
         val tomorrow = today.plus(1, DateTimeUnit.DAY)
         val inTwoDays = today.plus(2, DateTimeUnit.DAY)
@@ -79,8 +82,8 @@ object SampleActivities {
                 durationMinutes = 120,
                 location = ResidenceLocation.COMMON_ROOM,
                 maxParticipants = 5,
-                creatorId = CurrentUser.ID, // created by the user of the app
-                participantIds = listOf(CurrentUser.ID, "user-e"),
+                creatorId = DEMO_USER_ID, // created by the user of the app
+                participantIds = listOf(DEMO_USER_ID, "user-e"),
                 description = "Catan and Uno.",
             ),
             Activity(
@@ -104,7 +107,7 @@ object SampleActivities {
                 location = ResidenceLocation.COMMON_ROOM,
                 maxParticipants = 4,
                 creatorId = "user-g",
-                participantIds = listOf("user-g", CurrentUser.ID), // COMPLETED, joined by the user
+                participantIds = listOf("user-g", DEMO_USER_ID), // COMPLETED, joined by the user
             ),
         )
     }

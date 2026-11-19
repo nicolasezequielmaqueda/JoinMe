@@ -1,5 +1,8 @@
 package com.joinme.util
 
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -19,22 +22,36 @@ import kotlin.time.Instant
 @OptIn(ExperimentalTime::class)
 object DateTimeUtils {
 
-    /** Current date and time in the time zone of the phone. */
+    // The residence is in Łódź and the database uses the same time zone, so all times match.
+    private val RESIDENCE_ZONE = TimeZone.of("Europe/Warsaw")
+
+    /** Current date and time in the time zone of the residence. */
     fun now(): LocalDateTime =
-        Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        Clock.System.now().toLocalDateTime(RESIDENCE_ZONE)
 
     fun today(): LocalDate = now().date
+
+    /** Emits the current time now and every minute, so lists change at midnight or when an activity ends. */
+    fun nowEveryMinute(): Flow<LocalDateTime> = flow {
+        while (true) {
+            emit(now())
+            delay(60_000)
+        }
+    }
 
     /** "Today", "Tomorrow", "Yesterday" or e.g. "Sat 17 Oct". */
     fun formatDate(date: LocalDate, today: LocalDate = today()): String = when (date) {
         today -> "Today"
         today.plus(1, DateTimeUnit.DAY) -> "Tomorrow"
         today.minus(1, DateTimeUnit.DAY) -> "Yesterday"
-        else -> {
-            val dayName = date.dayOfWeek.name.take(3).lowercase().replaceFirstChar { it.uppercase() }
-            val monthName = date.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }
-            "$dayName ${date.day} $monthName"
-        }
+        else -> formatDayMonth(date)
+    }
+
+    /** Date that does not depend on today, e.g. "Sat 17 Oct". */
+    fun formatDayMonth(date: LocalDate): String {
+        val dayName = date.dayOfWeek.name.take(3).lowercase().replaceFirstChar { it.uppercase() }
+        val monthName = date.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }
+        return "$dayName ${date.day} $monthName"
     }
 
     /** Long date for headers, e.g. "Wednesday, 14 October". */
@@ -42,6 +59,12 @@ object DateTimeUtils {
         val dayName = date.dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase() }
         val monthName = date.month.name.lowercase().replaceFirstChar { it.uppercase() }
         return "$dayName, ${date.day} $monthName"
+    }
+
+    /** Date and time that do not depend on today, e.g. "18 Nov 14:32". */
+    fun formatShortDateTime(dateTime: LocalDateTime): String {
+        val monthName = dateTime.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }
+        return "${dateTime.day} $monthName ${formatTime(dateTime.time)}"
     }
 
     /** Always two digits, e.g. "09:05". */

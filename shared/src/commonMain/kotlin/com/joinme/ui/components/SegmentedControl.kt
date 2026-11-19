@@ -1,5 +1,6 @@
 package com.joinme.ui.components
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -15,14 +16,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.joinme.ui.theme.JoinMeDimens
 import com.joinme.ui.theme.JoinMeTheme
+import androidx.compose.runtime.getValue
+
+private val SegmentShape = RoundedCornerShape(8.dp)
 
 /**
  * A row of options with a rounded background around the selected option.
+ * The control is 36 dp high; each option keeps a 48 dp tap area.
  */
 @Composable
 fun SegmentedControl(
@@ -35,29 +45,47 @@ fun SegmentedControl(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(10.dp))
-            .background(colors.fill)
-            .padding(3.dp)
+            // The grey container is drawn 6 dp inside the 48 dp options, which makes it 36 dp high.
+            .drawBehind {
+                val inset = 6.dp.toPx()
+                drawRoundRect(
+                    color = colors.fill,
+                    topLeft = Offset(0f, inset),
+                    size = Size(size.width, size.height - 2 * inset),
+                    cornerRadius = CornerRadius(JoinMeDimens.radiusS.toPx()),
+                )
+            }
             .selectableGroup(),
     ) {
         options.forEachIndexed { index, option ->
             val selected = index == selectedIndex
+            val segmentColor by animateColorAsState(if (selected) colors.fillSelected else colors.fillSelected.copy(alpha = 0f))
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .weight(1f)
-                    .heightIn(min = 40.dp)
-                    .then(if (selected) Modifier.shadow(1.dp, RoundedCornerShape(8.dp)) else Modifier)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(if (selected) colors.surface else Color.Transparent)
-                    .selectable(selected = selected, role = Role.Tab, onClick = { onSelect(index) }),
+                    .heightIn(min = JoinMeDimens.minTouchTarget)
+                    .selectable(selected = selected, role = Role.Tab, onClick = { onSelect(index) })
+                    .padding(horizontal = 2.dp, vertical = 8.dp),
             ) {
-                Text(
-                    text = option,
-                    style = if (selected) MaterialTheme.typography.labelLarge else MaterialTheme.typography.bodyMedium,
-                    color = colors.textPrimary,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
-                )
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 32.dp)
+                        .then(if (selected && !colors.isDark) Modifier.shadow(1.dp, SegmentShape) else Modifier)
+                        .clip(SegmentShape)
+                        .background(segmentColor),
+                ) {
+                    Text(
+                        text = option,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+                        ),
+                        color = colors.textPrimary,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    )
+                }
             }
         }
     }

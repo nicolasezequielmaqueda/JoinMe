@@ -36,8 +36,7 @@ fun statusColors(status: ActivityStatus): ToneColors {
     return when (status) {
         ActivityStatus.OPEN ->
             if (dark) ToneColors(Color(0xFF1E3326), Color(0xFF8FD4A6)) else ToneColors(Color(0xFFE3F1E7), Color(0xFF2D6B43))
-        ActivityStatus.FULL ->
-            if (dark) ToneColors(Color(0xFF3A2C17), Color(0xFFF0C47E)) else ToneColors(Color(0xFFFAEEDB), Color(0xFF8A5300))
+        ActivityStatus.FULL -> ToneColors(JoinMeTheme.colors.warningSoft, JoinMeTheme.colors.warning)
         ActivityStatus.CANCELLED ->
             if (dark) ToneColors(Color(0xFF3A1F1F), Color(0xFFF2A8A3)) else ToneColors(Color(0xFFFBE6E4), Color(0xFFA3271F))
         ActivityStatus.COMPLETED ->
@@ -50,7 +49,10 @@ fun statusColors(status: ActivityStatus): ToneColors {
 fun joinedColors(): ToneColors =
     ToneColors(JoinMeTheme.colors.accentSoft, JoinMeTheme.colors.accent)
 
-/** Red used only for destructive actions (cancel an activity). */
+/** Colour of the places indicator: accent while open, warning with 1 or 2 left, grey when full. */
 @Composable
-fun destructiveColor(): Color =
-    if (JoinMeTheme.colors.isDark) Color(0xFFFF6961) else Color(0xFFB3261E)
+fun placesColor(free: Int): Color = when {
+    free <= 0 -> JoinMeTheme.colors.textSecondary
+    free <= 2 -> JoinMeTheme.colors.warning
+    else -> JoinMeTheme.colors.accent
+}

@@ -30,7 +30,7 @@ fun JoinMeTheme(content: @Composable () -> Unit) {
         surface = colors.surface,
         onSurface = colors.textPrimary,
         onSurfaceVariant = colors.textSecondary,
-        surfaceContainerHigh = colors.surface,
+        surfaceContainerHigh = colors.surfaceElevated,
         surfaceContainerHighest = colors.fill,
         outline = colors.separator,
         outlineVariant = colors.separator,

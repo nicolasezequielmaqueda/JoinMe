@@ -29,6 +29,10 @@ class LocalActivityRepository(
     private val _activities = MutableStateFlow(initialActivities)
     override val activities: StateFlow<List<Activity>> = _activities.asStateFlow()
 
+    // Everything is already on this device, so there is nothing to download.
+    override val lastUpdated: StateFlow<String?> = MutableStateFlow<String?>(null).asStateFlow()
+    override val refreshError: StateFlow<String?> = MutableStateFlow<String?>(null).asStateFlow()
+
     // Simple counter to give each new activity a different id.
     private var nextId = (initialActivities.mapNotNull {
         it.id.removePrefix("new-").toIntOrNull()
@@ -37,6 +41,13 @@ class LocalActivityRepository(
 
     override fun getActivity(id: String): Activity? =
         _activities.value.find { it.id == id }
+
+    override suspend fun refresh(): String? = null
+
+    override suspend fun clearLocalData() = changes.withLock {
+        save(emptyList())
+        _activities.value = emptyList()
+    }
 
     override suspend fun createActivity(form: NewActivityForm, userId: String): ActivityResult = changes.withLock {
         val error = ActivityValidator.validate(form, now())

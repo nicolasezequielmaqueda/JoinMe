@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.joinme.model.ActivityType
 import com.joinme.ui.icons.icon
+import com.joinme.ui.theme.JoinMeDimens
 import com.joinme.ui.theme.categoryColors
 
 /**
@@ -20,19 +21,19 @@ import com.joinme.ui.theme.categoryColors
  * It is decorative: the activity name is always shown next to it.
  */
 @Composable
-fun ActivityIconTile(type: ActivityType, size: Dp = 48.dp, modifier: Modifier = Modifier) {
+fun ActivityIconTile(type: ActivityType, size: Dp = 44.dp, modifier: Modifier = Modifier) {
     val colors = categoryColors(type.category)
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .size(size)
-            .background(colors.background, RoundedCornerShape(size * 0.28f)),
+            .background(colors.background, RoundedCornerShape(JoinMeDimens.radiusM)),
     ) {
         Icon(
             imageVector = type.icon,
             contentDescription = null,
             tint = colors.content,
-            modifier = Modifier.size(size * 0.5f),
+            modifier = Modifier.size(size * 0.55f),
         )
     }
 }

@@ -37,15 +37,15 @@ fun joinMeTypography(): Typography {
         letterSpacing = spacing.sp,
     )
     return Typography(
-        headlineLarge = style(32, FontWeight.Bold, 38, -0.5),   // large screen title
-        headlineMedium = style(26, FontWeight.Bold, 32, -0.4),  // detail title
-        titleLarge = style(20, FontWeight.SemiBold, 26, -0.2),
-        titleMedium = style(17, FontWeight.SemiBold, 22, -0.2), // card title
-        bodyLarge = style(17, FontWeight.Normal, 22, -0.2),
-        bodyMedium = style(15, FontWeight.Normal, 20, -0.1),
-        bodySmall = style(13, FontWeight.Normal, 18),
-        labelLarge = style(16, FontWeight.SemiBold, 21, -0.1), // buttons
-        labelMedium = style(13, FontWeight.SemiBold, 16),       // pills
-        labelSmall = style(11, FontWeight.Medium, 13, 0.1),     // tab bar, small caps
+        headlineLarge = style(34, FontWeight.Bold, 41, -0.4),   // large screen title
+        headlineMedium = style(22, FontWeight.Bold, 28),        // detail title
+        titleLarge = style(20, FontWeight.Bold, 25),            // day group headers, empty states
+        titleMedium = style(17, FontWeight.SemiBold, 22),       // card title, headline
+        bodyLarge = style(17, FontWeight.Normal, 22),
+        bodyMedium = style(15, FontWeight.Normal, 20),          // subhead
+        bodySmall = style(13, FontWeight.Normal, 18),           // footnote
+        labelLarge = style(17, FontWeight.SemiBold, 22),        // buttons
+        labelMedium = style(12, FontWeight.SemiBold, 16),       // pills, captions
+        labelSmall = style(13, FontWeight.SemiBold, 18, 0.3),   // section headers (uppercase)
     )
 }

@@ -6,7 +6,7 @@ import com.adamglin.phosphoricons.Bold
 import com.adamglin.phosphoricons.Fill
 import com.adamglin.phosphoricons.Regular
 import com.adamglin.phosphoricons.bold.CaretLeft
-import com.adamglin.phosphoricons.bold.CaretRight
+import com.adamglin.phosphoricons.bold.Check
 import com.adamglin.phosphoricons.bold.Minus
 import com.adamglin.phosphoricons.bold.Plus
 import com.adamglin.phosphoricons.fill.Cards
@@ -22,17 +22,27 @@ import com.adamglin.phosphoricons.fill.TennisBall
 import com.adamglin.phosphoricons.fill.NumberCircleEight
 import com.adamglin.phosphoricons.fill.GameController
 import com.adamglin.phosphoricons.fill.CalendarCheck
+import com.adamglin.phosphoricons.regular.ArrowClockwise
 import com.adamglin.phosphoricons.regular.CalendarBlank
+import com.adamglin.phosphoricons.regular.CheckCircle
+import com.adamglin.phosphoricons.regular.CloudRain
 import com.adamglin.phosphoricons.regular.Clock
 import com.adamglin.phosphoricons.regular.Couch
 import com.adamglin.phosphoricons.regular.Door
+import com.adamglin.phosphoricons.regular.Eye
+import com.adamglin.phosphoricons.regular.EyeSlash
+import com.adamglin.phosphoricons.regular.FileText
 import com.adamglin.phosphoricons.regular.Hourglass
 import com.adamglin.phosphoricons.regular.MapPin
-import com.adamglin.phosphoricons.regular.Notepad
-import com.adamglin.phosphoricons.regular.SquaresFour
+import com.adamglin.phosphoricons.regular.ShareNetwork
+import com.adamglin.phosphoricons.regular.SignOut
 import com.adamglin.phosphoricons.regular.Television
+import com.adamglin.phosphoricons.regular.Trash
 import com.adamglin.phosphoricons.regular.Tree
-import com.adamglin.phosphoricons.regular.Users
+import com.adamglin.phosphoricons.regular.Sun
+import com.adamglin.phosphoricons.regular.UserCircle
+import com.adamglin.phosphoricons.regular.Warning
+import com.adamglin.phosphoricons.regular.WarningCircle
 import com.adamglin.phosphoricons.regular.GameController as GameControllerRegular
 import com.adamglin.phosphoricons.regular.CourtBasketball as CourtBasketballRegular
 import com.adamglin.phosphoricons.regular.Compass as CompassRegular
@@ -54,18 +64,27 @@ object AppIcons {
 
     // Controls
     val Back: ImageVector get() = PhosphorIcons.Bold.CaretLeft
-    val Chevron: ImageVector get() = PhosphorIcons.Bold.CaretRight
+    val Check: ImageVector get() = PhosphorIcons.Bold.Check
+    val CheckCircle: ImageVector get() = PhosphorIcons.Regular.CheckCircle
     val Plus: ImageVector get() = PhosphorIcons.Bold.Plus
     val Minus: ImageVector get() = PhosphorIcons.Bold.Minus
+    val Account: ImageVector get() = PhosphorIcons.Regular.UserCircle
+    val ShowPassword: ImageVector get() = PhosphorIcons.Regular.Eye
+    val HidePassword: ImageVector get() = PhosphorIcons.Regular.EyeSlash
+    val Warning: ImageVector get() = PhosphorIcons.Regular.Warning
+    val WarningCircle: ImageVector get() = PhosphorIcons.Regular.WarningCircle
+    val Refresh: ImageVector get() = PhosphorIcons.Regular.ArrowClockwise
+    val Share: ImageVector get() = PhosphorIcons.Regular.ShareNetwork
+    val InviteText: ImageVector get() = PhosphorIcons.Regular.FileText
+    val SignOut: ImageVector get() = PhosphorIcons.Regular.SignOut
+    val Delete: ImageVector get() = PhosphorIcons.Regular.Trash
+    val Sunny: ImageVector get() = PhosphorIcons.Regular.Sun
+    val Rainy: ImageVector get() = PhosphorIcons.Regular.CloudRain
 
     // Information rows
     val Date: ImageVector get() = PhosphorIcons.Regular.CalendarBlank
     val Time: ImageVector get() = PhosphorIcons.Regular.Clock
     val Duration: ImageVector get() = PhosphorIcons.Regular.Hourglass
-    val Location: ImageVector get() = PhosphorIcons.Regular.MapPin
-    val People: ImageVector get() = PhosphorIcons.Regular.Users
-    val Category: ImageVector get() = PhosphorIcons.Regular.SquaresFour
-    val Notes: ImageVector get() = PhosphorIcons.Regular.Notepad
 }
 
 /** Icon that represents each activity type. */

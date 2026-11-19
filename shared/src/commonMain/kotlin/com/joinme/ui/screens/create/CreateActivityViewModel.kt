@@ -3,7 +3,6 @@ package com.joinme.ui.screens.create
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.joinme.data.ActivityRepository
-import com.joinme.data.CurrentUser
 import com.joinme.domain.ActivityResult
 import com.joinme.domain.ActivityValidator
 import com.joinme.model.ActivityType
@@ -38,7 +37,10 @@ data class CreateActivityUiState(
  * Check the form after every change to decide whether to enable Create.
  * The repository checks it again when saving, including the current time.
  */
-class CreateActivityViewModel(private val repository: ActivityRepository) : ViewModel() {
+class CreateActivityViewModel(
+    private val repository: ActivityRepository,
+    private val userId: String,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(stateFor(NewActivityForm()))
     val uiState: StateFlow<CreateActivityUiState> = _uiState.asStateFlow()
@@ -78,7 +80,7 @@ class CreateActivityViewModel(private val repository: ActivityRepository) : View
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, saveError = null) }
-            when (val result = repository.createActivity(state.form, CurrentUser.ID)) {
+            when (val result = repository.createActivity(state.form, userId)) {
                 is ActivityResult.Success ->
                     _uiState.update { it.copy(isSaving = false, createdActivityId = result.activity.id) }
                 is ActivityResult.Error ->

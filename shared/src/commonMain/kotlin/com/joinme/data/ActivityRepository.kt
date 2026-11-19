@@ -8,10 +8,22 @@ import kotlinx.coroutines.flow.StateFlow
 /** The ViewModels use this interface to read and change activities. */
 interface ActivityRepository {
 
-    /** The ViewModels use this interface to read and change activities. */
+    /** The current list of activities. It emits a new list after every change. */
     val activities: StateFlow<List<Activity>>
 
+    /** When the list was last downloaded, as text for the user. Null if it never was. */
+    val lastUpdated: StateFlow<String?>
+
+    /** Message of the last refresh if it failed, or null if it worked. */
+    val refreshError: StateFlow<String?>
+
     fun getActivity(id: String): Activity?
+
+    /** Downloads the list again. Returns null if it worked, or a message for the user. */
+    suspend fun refresh(): String?
+
+    /** Removes the activities saved on this device, e.g. before signing out. */
+    suspend fun clearLocalData()
 
     suspend fun createActivity(form: NewActivityForm, userId: String): ActivityResult
 
