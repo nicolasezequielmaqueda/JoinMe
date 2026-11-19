@@ -3,9 +3,10 @@
 
 ## Small change reviewed: saved weather after a failed refresh
 
-- **Proposal:** add a weather panel with a refresh button and a loading indicator.
-- **Correction:** keep the last good reading when a new request fails or returns no data. Show the reading time, warn that it may be old, and leave Refresh available. Joining and creating activities still use local data.
-- **What to inspect:** `WeatherViewModel.refresh` keeps the previous reading in both cases. The Android source saves a reading only after it can read its fields.
-- **Result:** the Android emulator showed a live reading, kept it when Wi-Fi and mobile data were off, and loaded a reading again when the connection returned. We could still join an activity offline. The response tests passed for valid, empty and incomplete JSON. The [demo notes](docs/m2/demo.md) explain the test setup.
+- **Proposal:** add a weather panel with a refresh button and a loading message.
+- **Accepted:** keep the last good reading when a refresh fails or returns no data.
+- **Corrected for this version:** show an hourly forecast for the start of the activity. Show a saved forecast only if it covers that date and hour. Display its update time and allow another refresh.
+- **What to inspect:** `WeatherViewModel.refresh` keeps the previous reading on failure. `OpenMeteoWeather` only saves a response after it finds a matching forecast.
+- **Verification:** the JVM forecast tests and both Android cache tests passed. The live service returned the expected hourly fields from Windows. The Android forecast and offline checks with a configured sign-in are still to be demonstrated.
 
-We used AI to suggest and implement small changes, and checked them against the running Android app and source. Each team member should be able to explain the event path and reproduce the checks.
+The earlier prototype could join activities offline. In this build, users can read the Room copy offline and need a connection to change the shared list. The [demo checklist](docs/m2/demo.md) covers both paths.

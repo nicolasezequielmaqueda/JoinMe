@@ -15,7 +15,7 @@ JoinMe helps adult Erasmus and international students find people for activities
 - Join, create, leave and cancel activities. The create form shows a preview before you save.
 - A local reminder 30 minutes before an activity you take part in. The app asks for the notification permission after sign-in. If you deny it, everything else works the same and you only lose the reminders.
 - Share an activity as plain text through the Android share menu.
-- Current weather for outdoor activities, from Open-Meteo.
+- Hourly forecast for the start of outdoor activities, from Open-Meteo.
 - Sign out and delete your account (this also deletes your data in the database).
 
 The main task is **find Table Tennis → open details → join → find it in My Activities**. The demo people, places and activities are **fictional** and come from `supabase/seed.sql`. Do not put personal information in activity notes.
@@ -40,7 +40,7 @@ The app needs a Supabase project, so there are a few setup steps before the firs
 
 - [Build, run and demo](DEPLOY.md): setup, Supabase, commands and demo steps.
 - [Database](supabase/README.md): schema, demo users and seed.
-- [M2 report](M2.md): works checklist, architecture, limitations and next fixes.
+- [M2 report](M2.md): demo checklist, architecture, verification and next fixes.
 - [Demo checklist](docs/m2/demo.md): how to show the main flow and a network failure.
 - [AI use and checks](AI_USE.md): review of a small change.
 - [Project notes](CONTEXT.md): code structure and event flow.

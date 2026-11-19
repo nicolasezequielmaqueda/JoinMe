@@ -1,41 +1,34 @@
 
-# JoinMe M2 | Demo steps
+# JoinMe M2 | Android demo
 
-Use the Android emulator and the debug APK. [Build instructions](../../DEPLOY.md)
+Follow the [build and Supabase setup](../../DEPLOY.md). Use the demo project and fictional data. Before the demo, run `supabase/seed.sql` so the sample activities are upcoming again. Keep the device signed in for the restart and offline checks.
 
-1. Open the app with fresh demo data. Find **Table Tennis**, open its details and press **Join activity**. Show **2 of 2**, **FULL** and **Leave activity**. Go back and find it under **My Activities → Upcoming → Joined**.
-2. Press **New**. Show the validation message with the form incomplete. Choose an activity, tomorrow's date, a time and a place. Create it and find it under **Created by you**.
-3. Force stop and reopen the app. Show both items in My Activities. Rotating with a form open should keep the draft on screen. An unfinished form is not saved when the process stops.
-4. Open the sample **Football** activity, scroll down and select **Check weather**. Show the reading and its time. Disable Wi-Fi and mobile data. Select **Refresh weather** and wait for the error. The saved reading stays visible and activity changes still work. Reconnect and try again.
-5. On an upcoming activity, select **Share activity**. Show the Android share menu and dismiss it without sending anything. Select **Show invite text** and long press the text to copy it. This uses the same invite dialog as the unavailable path.
-6. Open **My Activities** again. The joined list and locally saved activities do not depend on the weather request.
+1. Sign in as **demo2@joinme.test** with the password set in Supabase. **demo1** created Table Tennis.
+2. Open **Table Tennis**, which starts with one of two places taken. Press **Join activity**. Show **2 of 2**, **FULL** and **Leave activity**. Find it under **My Activities → Upcoming → Joined**.
+3. Tap **New** and show the validation message with the form still incomplete. Pick a future date and finish the form. Show **Preview**, create the activity, and find it under **Created by you**.
+4. Force stop the app and reopen it. Check the joined and created activities are visible. To check rotation, start another form, choose a type, and turn the device. The draft should keep the chosen type.
+5. Open **Football** at the Sports Court. Use **Check forecast** and show the hourly reading and its update time. The demo city is Łódź. The response comes from Open-Meteo.
+6. Disable Wi-Fi and mobile data. Pull to refresh in **Activities** and wait for **Offline · Last updated ...**. The saved activities should stay visible. Open an activity with places left and show why **Join** is disabled. Refresh the weather to show the failed refresh and the saved forecast. Reconnect and refresh again.
+7. For reminders, allow notifications and create or join an activity that starts more than 30 minutes ahead. For a short rehearsal, set its start about 33–35 minutes away. WorkManager aims to show the reminder 30 minutes before the start and Android may delay it. Then turn off notifications in Android settings and reopen **My Activities**. Show **Reminders are off** and that the activity details remain available.
+8. On an upcoming activity, use **Share activity** to open Android's share menu. Dismiss it. Select **Show invite text** to see the text that can be copied.
+9. Sign out after the offline checks. The app returns to login and clears saved activities and scheduled reminders for this session.
 
-A fresh installation creates sample dates relative to the first launch. After you save a change, those dates stay fixed. If you want to repeat the demo later and the sample events have ended, install on a fresh emulator or create new activities. Clearing app storage also resets the demo but removes saved activities.
+## Forecast response example
 
-## API example
+`GET /v1/forecast` with the coordinates of Łódź, the activity date as both `start_date` and `end_date`, and `temperature_2m`, `precipitation_probability` and `precipitation` as hourly fields.
 
-`GET /v1/forecast?latitude=51.76&longitude=19.46&current=temperature_2m,precipitation&timezone=Europe%2FWarsaw`
-
-Example response fragment (test fixture):
+Example fragment for a test, using made-up values:
 
 ```json
-{"current":{"time":"2026-11-18T16:30","temperature_2m":8.5,"precipitation":0.0}}
+{"hourly":{"time":["2026-11-20T17:00"],"temperature_2m":[8.5],"precipitation_probability":[15],"precipitation":[0.0]}}
 ```
 
-The response tests use sample JSON for a good reading, an empty result and missing fields. The offline demo uses the real service with the emulator connection switched off.
-
-## Checks on Medium Phone API 36.1
+## Verification for this build
 
 | Check | Result |
 |---|---|
-| Find, join, create and restart | Table Tennis showed 2 of 2 and appeared under Joined. The created Badminton activity and the joined activity both survived a force stop and reopen. |
-| Cancel and reopen | Board Games moved to Past and still showed CANCELLED after a process restart. |
-| Rotate an unfinished form | The selected activity type stayed in the form. The missing date message still appeared. |
-| Live weather and retry | The app received a real Open-Meteo reading and loaded it again after reconnecting. |
-| Network loss | With Wi-Fi and mobile data off, the app showed an error and kept the saved reading visible. Joining still used the local list. |
-| Good, empty and unexpected JSON | All three Android response tests passed with controlled JSON examples. |
-| Android sharing | The system share menu opened. No message was sent during this check. Show invite text opened the manual option. |
-| Share unavailable | A temporary test build tried to open a missing activity. The app caught Android's error and showed the invite text. |
-| Activity rules and form validation | All 14 tests passed. |
-
-The Windows host uses Avast HTTPS inspection. The emulator rejected its certificate with Android's normal trust settings. For the live API check only, a temporary build trusted the host certificate for the Open-Meteo domain. The submitted APK uses Android's normal HTTPS trust settings. Use a connected Android phone or an emulator with a trusted connection for the live demo if this host still blocks it.
+| Build and launch | The debug APK built and opened the login screen on Medium Phone API 36.1. |
+| Automated tests | 98 JVM tests and two Android forecast cache tests passed. |
+| Database | The schema and seed ran in local PostgreSQL with test identities. Create, join, leave, cancel and account deletion passed. Two people trying for the last place left the activity at its limit. |
+| Live forecast | Open-Meteo returned the hourly fields from Windows. |
+| Full Android demo | Sign-in with the team's Supabase project, restart and offline checks, and notification delivery with permission on and off still need a live run. |

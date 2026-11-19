@@ -29,7 +29,7 @@ SUPABASE_URL=https://YOUR-PROJECT.supabase.co
 SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 ```
 
-`local.properties` is not committed. Without these two lines the app still compiles, but sign-in fails. Rebuild after changing them.
+`local.properties` is not committed. Without these two lines the app can open the login screen but sign-in fails and may show an offline error. Rebuild after changing them.
 
 The seed uses dates relative to today. Run `seed.sql` again before each demo, otherwise the activities may already be over.
 
@@ -56,13 +56,12 @@ The optional iOS target needs a Mac and Xcode. It compiles but has no login or R
 
 ## Demo steps
 
-Use the emulator with the network on. Run `seed.sql` first.
+Use the emulator with the network on. Run the demo seed in Supabase first.
 
-1. Sign in with a demo account (for example `demo1@joinme.test`, with the password you set when creating it).
-2. In **Activities**, show the list grouped by day. Open **Table Tennis** (1 free place), press **Join activity** and show **2 of 2** and **FULL**.
-3. Open **My Activities** and find it under **Upcoming → Joined**.
-4. Press **New**, leave the form incomplete to show the validation message, then fill it in. Show the **Preview** and create the activity. Find it under **Created by you**.
-5. Open **Football** (outdoor), scroll down and select **Check weather**.
-6. Turn on airplane mode, pull to refresh and show the "Offline · Last updated ..." line. The list is still readable; joining shows a message that it needs a connection (it can take a few seconds).
-7. Reminders: joining an activity that starts in more than 30 minutes schedules a reminder. To show the permission-denied case, turn off notifications for JoinMe in the system settings, reopen the app and show that it works the same.
-8. Open the account screen and sign out. The login screen appears and the saved activities are removed from the device.
+1. Sign in as **demo2@joinme.test** with the password set for that account. **demo1** created Table Tennis.
+2. Open **Table Tennis**, press **Join activity**, and show **2 of 2**, **FULL** and the entry in **My Activities → Upcoming → Joined**.
+3. Show the validation and preview when creating an activity. Save it, force stop the app, and reopen it with the same account to show the saved list.
+4. Open **Football** and use **Check forecast**. Then turn off Wi-Fi and mobile data, pull to refresh, and show the saved list and the offline message. Reconnect and refresh.
+5. Show the reminder permission and its fallback. With notifications off, **My Activities** still shows the activity time and place and explains how to turn reminders on.
+
+See the [full M2 demo checklist](docs/m2/demo.md) for preparation, timing and test results.
